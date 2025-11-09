@@ -667,7 +667,39 @@ function shareResult() {
   }
 }
 // Restart
-function restart() { location.reload(); }
+// ✅ Trusted invite-only keys (each person gets a unique one)
+const validKeys = ["abc123", "friend02", "teamA", "vidithVIP"];
+
+// ✅ Optional shared fallback password
+const accessCode = "brainrot";
+
+// ✅ Get the key from URL query (e.g., ?key=abc123)
+const params = new URLSearchParams(window.location.search);
+const urlKey = params.get("key");
+
+// ✅ Helper: block the page immediately
+function blockAccess() {
+  document.body.innerHTML = "<h1 style='color:red;text-align:center;margin-top:40vh;font-family:sans-serif;'>🚫 Access Denied</h1>";
+  throw new Error("Access denied");
+}
+
+// ✅ Skip if already verified this session
+if (!sessionStorage.getItem("accessGranted")) {
+  if (urlKey && validKeys.includes(urlKey)) {
+    // URL key matched!
+    sessionStorage.setItem("accessGranted", "true");
+    console.log("Access granted via URL key ✅");
+  } else {
+    // Ask for password instead
+    const entered = prompt("🔒 Enter Access Code to Continue:");
+    if (entered === accessCode) {
+      sessionStorage.setItem("accessGranted", "true");
+      console.log("Access granted via password ✅");
+    } else {
+      blockAccess();
+    }
+  }
+}
 </script>
 </body>
 </html>
